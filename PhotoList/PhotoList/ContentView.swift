@@ -61,7 +61,7 @@ struct PhotoListView: View {
         NavigationView {
             switch remote.state {
             case .loading:
-                Text("loading...")
+                ActivityIndicatorView()
                     .onAppear { self.remote.load() }
             case let .loaded(photos):
                 List {
@@ -91,7 +91,7 @@ struct PhotoView: View {
     var body: some View {
         switch remote.state {
         case .loading:
-            Text("loading...")
+            ActivityIndicatorView()
                 .onAppear { self.remote.load() }
             
         case let .loaded(image):
@@ -99,6 +99,18 @@ struct PhotoView: View {
                 .resizable()
                 .aspectRatio(image.size, contentMode: .fit)
         }
+    }
+}
+
+struct ActivityIndicatorView: UIViewRepresentable {
+        
+    func makeUIView(context: Context) -> UIActivityIndicatorView {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.startAnimating()
+        return indicator
+    }
+    
+    func updateUIView(_ uiView: UIActivityIndicatorView, context: Context) {
     }
 }
 
