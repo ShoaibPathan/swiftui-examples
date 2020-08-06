@@ -22,6 +22,7 @@ final class Remote<DataType>: ObservableObject {
     enum State {
         case loading
         case loaded(DataType)
+        case error(Error)
     }
     
     @Published private(set) var state: State = .loading
@@ -38,12 +39,15 @@ final class Remote<DataType>: ObservableObject {
         URLSession(configuration: .default)
             .dataTask(with: url) { [weak self] (data, _, error) in
                 DispatchQueue.main.async {
-                    guard let self = self, let data = data else {
+                    guard let self = self else {
                         return
                     }
-                    
-                    if let transformedData = self.transform(data) {
+                    if let error = error {
+                        self.state = .error(error)
+                    } else if let data = data, let transformedData = self.transform(data) {
                         self.state = .loaded(transformedData)
+                    } else {
+                        fatalError("Unexpected case")
                     }
                 }
             }
@@ -71,6 +75,8 @@ struct PhotoListView: View {
                         }
                     }
                 }
+            case .error:
+                Text("Failed to photo list")
             }
         }
     }
@@ -98,6 +104,8 @@ struct PhotoView: View {
             Image(uiImage: image)
                 .resizable()
                 .aspectRatio(image.size, contentMode: .fit)
+        case .error:
+            Text("Failed to load image")
         }
     }
 }
