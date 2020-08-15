@@ -61,10 +61,14 @@ final class TimerViewStore: ObservableObject {
 }
 
 struct TimerView: View {
-    @ObservedObject private(set) var viewStore: TimerViewStore = .init()
+    @ObservedObject private var viewStore: TimerViewStore
     
     private var timerState: TimerState {
         return viewStore.state
+    }
+    
+    init(viewStore: TimerViewStore) {
+        self.viewStore = viewStore
     }
 
     var body: some View {
@@ -104,7 +108,14 @@ private extension Date {
 }
 
 struct ContentView: View {
+    
+    @ObservedObject private var timerViewStore: TimerViewStore
+    
+    init(timerViewStore: TimerViewStore) {
+        self.timerViewStore = timerViewStore
+    }
+    
     var body: some View {
-        TimerView()
+        TimerView(viewStore: timerViewStore)
     }
 }
