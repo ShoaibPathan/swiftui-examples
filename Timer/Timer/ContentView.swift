@@ -60,6 +60,11 @@ final class TimerViewStore: ObservableObject {
     }
 }
 
+
+final class TimerViewModelStore: ObservableObject {
+    
+}
+
 struct TimerView: View {
     @ObservedObject private var viewStore: TimerViewStore
     
