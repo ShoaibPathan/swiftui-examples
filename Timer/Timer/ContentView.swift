@@ -60,12 +60,8 @@ final class TimerViewStore: ObservableObject {
     }
 }
 
-
-final class TimerViewModelStore: ObservableObject {
-    
-}
-
 struct TimerView: View {
+
     @ObservedObject private var viewStore: TimerViewStore
     
     private var timerState: TimerState {
@@ -75,23 +71,44 @@ struct TimerView: View {
     init(viewStore: TimerViewStore) {
         self.viewStore = viewStore
     }
-
+    
     var body: some View {
-      VStack {
-          Text(timerState.elapsedTime.map {$0.duration.format()} ?? "0m")
-          Text(
-            timerState.isActive ?
-                "Start at \(timerState.elapsedTime!.start.timeFormat())" :
-                timerState.elapsedTime.map {"From \($0.start.timeFormat()) to \($0.end.timeFormat())"} ?? ""
-          )
-          Button(action: { viewStore.send(.toggleTimerButtonTapped) }) {
-            Text(timerState.isActive ? "Stop" : "Start")
-            .foregroundColor(.white)
-            .padding()
-            .background(timerState.isActive ? Color.red : .blue)
-            .cornerRadius(16)
-          }
-      }
+        let viewModel = TimerView.ViewModel(viewStore.state)
+        VStack {
+          Text(viewModel.primaryText)
+          Text(viewModel.secondaryText)
+            Button(action: { viewStore.send(.toggleTimerButtonTapped) }) {
+              Text(viewModel.buttonTitle)
+              .foregroundColor(.white)
+              .padding()
+              .background(viewModel.buttonColor)
+              .cornerRadius(16)
+            }
+        }
+    }
+}
+
+private extension TimerView {
+    
+    struct ViewModel {
+        var primaryText: String
+        var secondaryText: String
+        var buttonTitle: String
+        var buttonColor: Color
+    }
+}
+
+private extension TimerView.ViewModel {
+    
+    init(_ state: TimerState) {
+        self.init(
+            primaryText: state.elapsedTime.map {$0.duration.format()} ?? "0m",
+            secondaryText: state.isActive ?
+                "Start at \(state.elapsedTime!.start.timeFormat())" :
+                state.elapsedTime.map {"From \($0.start.timeFormat()) to \($0.end.timeFormat())"} ?? "",
+            buttonTitle: state.isActive ? "Stop" : "Start",
+            buttonColor: state.isActive ? Color.red : .blue
+        )
     }
 }
 
